@@ -1,0 +1,19 @@
+<resources>
+    <string-array name="main_titles">
+        <item>@string/title_joke</item>
+        <item>@string/title_video</item>
+        <item>@string/title_beauty</item>
+    </string-array>
+    <string name="app_name">轻松一刻</string>
+    <string name="title_video">视频</string>
+    <string name="title_joke">笑话</string>
+    <string name="title_beauty">妹子</string>
+    <string name="count">1/5</string>
+    <string name="save">保存</string>
+    <string name="exitApp">再按一次退出程序</string>
+    <string name="load_more">加载更多</string>
+
+    <string name="click_to_skip">3s 跳过</string>
+    <string name="end_to_skip">0s 跳过</string>
+    <string name="to_skip">s 跳过</string>
+</resources>

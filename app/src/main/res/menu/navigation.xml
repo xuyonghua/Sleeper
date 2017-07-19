@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_joke"
+        android:icon="@drawable/joke"
+        android:title="@string/title_joke" />
+
+    <item
+        android:id="@+id/navigation_video"
+        android:icon="@drawable/ic_video"
+        android:title="@string/title_video" />
+
+    <item
+        android:id="@+id/navigation_beauty"
+        android:icon="@drawable/beauty"
+        android:title="@string/title_beauty" />
+
+</menu>
