@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.tencent.bugly.crashreport.CrashReport;
 import com.xyh.sleeper.adapter.MainAdapter;
 import com.xyh.sleeper.http.RetrofitHelper;
 import com.xyh.sleeper.ui.beauty.BeautyFragment;
@@ -55,9 +56,12 @@ public class MainActivity extends AppCompatActivity {
                     viewPager.setCurrentItem(1);
                     return true;
                 case R.id.navigation_beauty:
+//                    List<String> list = null;
+//                    list.size();
                     title.setText(mTitles[2]);
                     viewPager.setCurrentItem(2);
                     return true;
+                    default:
             }
             return false;
         }
