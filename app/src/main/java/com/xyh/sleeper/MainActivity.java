@@ -10,7 +10,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import com.tencent.bugly.crashreport.CrashReport;
 import com.xyh.sleeper.adapter.MainAdapter;
 import com.xyh.sleeper.http.RetrofitHelper;
 import com.xyh.sleeper.ui.beauty.BeautyFragment;
@@ -24,10 +23,12 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import fm.jiecao.jcvideoplayer_lib.JCVideoPlayer;
+import me.yokeyword.fragmentation.SupportActivity;
+import me.yokeyword.fragmentation.SupportFragment;
 
-public class MainActivity extends AppCompatActivity {
-    @Bind(R.id.content)
-    ViewPager viewPager;
+public class MainActivity extends SupportActivity{
+//    @Bind(R.id.content)
+//    ViewPager viewPager;
     @Bind(R.id.navigation)
     BottomNavigationView navigation;
     @Bind(R.id.toolbar)
@@ -41,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
     private MainAdapter adapter;
 
+    private SupportFragment[] mFragments = new SupportFragment[3];
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -49,17 +52,18 @@ public class MainActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.navigation_joke:
                     title.setText(mTitles[0]);
-                    viewPager.setCurrentItem(0);
+                    showHideFragment(mFragments[0]);
+//                    viewPager.setCurrentItem(0);
                     return true;
                 case R.id.navigation_video:
                     title.setText(mTitles[1]);
-                    viewPager.setCurrentItem(1);
+                    showHideFragment(mFragments[1]);
+//                    viewPager.setCurrentItem(1);
                     return true;
                 case R.id.navigation_beauty:
-//                    List<String> list = null;
-//                    list.size();
                     title.setText(mTitles[2]);
-                    viewPager.setCurrentItem(2);
+                    showHideFragment(mFragments[2]);
+//                    viewPager.setCurrentItem(2);
                     return true;
                     default:
             }
@@ -92,7 +96,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         initView();
-        initViewPager();
+//        initViewPager();
+
+        if(savedInstanceState == null){
+            mFragments[0] = new JokeFragment();
+            mFragments[1] = new VideoFragment();
+            mFragments[2] = new BeautyFragment();
+            loadMultipleRootFragment(R.id.content,0,mFragments[0],mFragments[1],mFragments[2]);
+        }else {
+            mFragments[0] = findFragment(JokeFragment.class);
+            mFragments[1] = findFragment(VideoFragment.class);
+            mFragments[2] = findFragment(BeautyFragment.class);
+        }
     }
 
     private void initViewPager() {
@@ -101,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentList.add(new VideoFragment());
         fragmentList.add(new BeautyFragment());
         adapter = new MainAdapter(getSupportFragmentManager(), fragmentList);
-        viewPager.setAdapter(adapter);
+//        viewPager.setAdapter(adapter);
     }
 
     private void initView() {
@@ -110,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         title.setText(mTitles[0]);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        viewPager.addOnPageChangeListener(mOnPageChangeListener);
+//        viewPager.addOnPageChangeListener(mOnPageChangeListener);
     }
 
     @Override
@@ -120,23 +135,26 @@ public class MainActivity extends AppCompatActivity {
         RetrofitHelper.getInstance().cancelAll();
     }
 
-    private static final int TIME_INTERVAL = 2000; // # milliseconds, desired time passed between two back presses.
+    private static final int TIME_INTERVAL = 2000;
     private long mBackPressed;
 
     @Override
-    public void onBackPressed() {
+    public void onBackPressedSupport() {
         if (JCVideoPlayer.backPress()) {
             return;
         }
-
-        if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis()) {
-            super.onBackPressed();
-            return;
-        } else {
-            ToastUtil.showCenter(getBaseContext(), R.string.exitApp);
+        if(getFragmentManager().getBackStackEntryCount()>1){
+            //如果当前存在fragment>1，当前fragment出栈
+            pop();
+        }else {
+            if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis()) {
+                finish();
+            } else {
+                ToastUtil.showCenter(getBaseContext(), R.string.exitApp);
+            }
+            mBackPressed = System.currentTimeMillis();
         }
 
-        mBackPressed = System.currentTimeMillis();
     }
 
 }

@@ -27,12 +27,13 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import me.yokeyword.fragmentation.SupportFragment;
 
 /**
  * Created by xyh on 2017/7/6.
  */
 
-public class JokeFragment extends Fragment implements BaseContract.View<JokeBean> {
+public class JokeFragment extends SupportFragment implements BaseContract.View<JokeBean> {
     private static final String TAG = "JokeFragment";
     @Bind(R.id.jokeRecyclerView)
     RecyclerView jokeRecyclerView;
@@ -51,9 +52,16 @@ public class JokeFragment extends Fragment implements BaseContract.View<JokeBean
         View view = inflater.inflate(R.layout.fragment_joke, container, false);
         ButterKnife.bind(this, view);
         presenter = new JokePresenter(this);
-        refreshData();
+
         initView();
         return view;
+    }
+
+    @Override
+    public void onLazyInitView(@Nullable Bundle savedInstanceState) {
+        super.onLazyInitView(savedInstanceState);
+        Log.d(TAG, "onLazyInitView: ");
+        refreshData();
     }
 
     private void refreshData() {

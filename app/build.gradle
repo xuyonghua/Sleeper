@@ -67,6 +67,8 @@ dependencies {
 
     compile 'fm.jiecao:jiecaovideoplayer:5.6'
 
+    compile 'me.yokeyword:fragmentation:1.2.4'
+
     compile "com.android.support:multidex:1.0.1" // 多dex配置
     //注释掉原有bugly的仓库
     //compile 'com.tencent.bugly:crashreport:latest.release'//其中latest.release指代最新版本号，也可以指定明确的版本号，例如2.3.2

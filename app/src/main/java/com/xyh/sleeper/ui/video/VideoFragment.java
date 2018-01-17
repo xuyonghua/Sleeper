@@ -23,12 +23,13 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import me.yokeyword.fragmentation.SupportFragment;
 
 /**
  * Created by xyh on 2017/7/6.
  */
 
-public class VideoFragment extends Fragment implements BaseContract.View<VideoBean> {
+public class VideoFragment extends SupportFragment implements BaseContract.View<VideoBean> {
     @Bind(R.id.videoRecyclerView)
     RecyclerView videoRecyclerView;
     @Bind(R.id.videoRefresh)
@@ -47,9 +48,14 @@ public class VideoFragment extends Fragment implements BaseContract.View<VideoBe
         View view = inflater.inflate(R.layout.fragment_video, container, false);
         ButterKnife.bind(this, view);
         presenter = new VideoPresenter(this);
-        initData();
         initView();
         return view;
+    }
+
+    @Override
+    public void onLazyInitView(@Nullable Bundle savedInstanceState) {
+        super.onLazyInitView(savedInstanceState);
+        initData();
     }
 
     private void initView() {

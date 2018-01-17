@@ -1,43 +1,90 @@
 package com.xyh.sleeper;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.signature.StringSignature;
+import com.xyh.sleeper.util.DateUtil;
+
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 
 
 public class SplashActivity extends AppCompatActivity {
 
+    private static final String TAG = "SplashActivity";
     private TextView mCountDownTextView;
-    private MyCountDownTimer mCountDownTimer;
-    private Handler mHandler = new Handler();
+    private ImageView adImage;
+    private Disposable mDisposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         mCountDownTextView = (TextView) findViewById(R.id.start_skip_count_down);
+        adImage = (ImageView) findViewById(R.id.image_ad);
         mCountDownTextView.setText(R.string.click_to_skip);
-        //创建倒计时类
-        mCountDownTimer = new MyCountDownTimer(3000, 1000);
-        mCountDownTimer.start();
-        //这是一个 Handler 里面的逻辑是从 Splash 界面跳转到 Main 界面
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                startPage();
-            }
-        }, 3000);
-
         findViewById(R.id.start_skip).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startPage();
             }
         });
+        mDisposable = Observable.interval(1, TimeUnit.SECONDS)
+                .take(3)
+                .map(new Function<Long, Long>() {
+                    @Override
+                    public Long apply(Long aLong) throws Exception {
+                        return 3 - (aLong + 1);
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long aLong) throws Exception {
+                        if (aLong == 0) {
+                            startPage();
+                        }
+                        mCountDownTextView.setText(aLong + "s 跳过");
+                    }
+                });
+
+        Glide.with(this)
+                .load("https://api.dujin.org/bing/1366.php")
+                .centerCrop()
+                .crossFade(800)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .signature(new StringSignature(DateUtil.getCurrentDate()))
+                .listener(new RequestListener<String, GlideDrawable>() {
+                    @Override
+                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                        Log.d(TAG, "onException: "+e.getMessage());
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        Log.d(TAG, "onResourceReady: "+model);
+                        return false;
+                    }
+                })
+                .into(adImage);
     }
 
     public void startPage() {
@@ -49,36 +96,10 @@ public class SplashActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        if (mCountDownTimer != null) {
-            mCountDownTimer.cancel();
-        }
-        if (mHandler != null) {
-            mHandler.removeCallbacksAndMessages(null);
+        if (mDisposable != null) {
+            mDisposable.dispose();
         }
         super.onDestroy();
-    }
-
-    class MyCountDownTimer extends CountDownTimer {
-        /**
-         * @param millisInFuture    表示以「 毫秒 」为单位倒计时的总数
-         *                          例如 millisInFuture = 1000 表示1秒
-         * @param countDownInterval 表示 间隔 多少微秒 调用一次 onTick()
-         *                          例如: countDownInterval = 1000 ; 表示每 1000 毫秒调用一次 onTick()
-         */
-
-        public MyCountDownTimer(long millisInFuture, long countDownInterval) {
-            super(millisInFuture, countDownInterval);
-        }
-
-
-        public void onFinish() {
-            mCountDownTextView.setText(R.string.end_to_skip);
-        }
-
-        public void onTick(long millisUntilFinished) {
-            mCountDownTextView.setText(millisUntilFinished / 1000 + getResources().getString(R.string.to_skip));
-        }
-
     }
 
 }

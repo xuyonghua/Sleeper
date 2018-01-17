@@ -22,12 +22,13 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import me.yokeyword.fragmentation.SupportFragment;
 
 /**
  * Created by xyh on 2017/7/6.
  */
 
-public class BeautyFragment extends Fragment implements BaseContract.View<BeautyBean>{
+public class BeautyFragment extends SupportFragment implements BaseContract.View<BeautyBean>{
     @Bind(R.id.beautyRecyclerView)
     RecyclerView beautyRecyclerView;
     @Bind(R.id.beautyRefresh)
@@ -42,9 +43,14 @@ public class BeautyFragment extends Fragment implements BaseContract.View<Beauty
         View view = inflater.inflate(R.layout.fragment_beauty, container, false);
         ButterKnife.bind(this, view);
         presenter = new BeautyPresenter(this);
-        refreshData();
         initView();
         return view;
+    }
+
+    @Override
+    public void onLazyInitView(@Nullable Bundle savedInstanceState) {
+        super.onLazyInitView(savedInstanceState);
+        refreshData();
     }
 
     private void initView() {
